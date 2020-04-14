@@ -39,13 +39,21 @@ app = Flask(__name__)
 def welcome():
     """List all available api routes."""
     return (
-        f"Welcome to Hawaii Weather and Precipitation Analysis API!!<br/><br/>"
-        f"Available Routes:<br/>"
-        f"/api/v1.0/precipitation - To view the precipitation data of last 12 months<br/>"
-        f"/api/v1.0/stations - To view a list of stations from the dataset <br/>"
-        f"/api/v1.0/tobs - To view the list of temperature observations of the most active station for the previous year<br/>"
-        f"/api/v1.0/<start> - To view a list of the minimum, average and the maximum temperatures for a given start date, type a start date as 2015-01-01<br/>"
-        f"/api/v1.0/<start>/<end> - To view a list of the minimum, average and the maximum temperatures for a given date range, type a start and end date as 2015-01-01/2015-01-10"
+        f"<h2>Welcome to Hawaii Weather and Precipitation Analysis API!!</h2>"
+        f"<img src='https://thebigphotos.com/wp-content/uploads/2018/07/wailea-hawaii.jpg'" 
+        f"<br/><br/><h3>Available Routes:</h3>"
+        f"<ul>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/precipitation'>Precipitation data</a></br>"
+        f"<i>Usage: Append /api/v1.0/precipitation to the URL </i></li><br/>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/stations'>Stations in the dataset</a><br/>"
+        f"<i>Usage: Append /api/v1.0/stations to the URL </i></li><br/>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/tobs'>Temperature observations of the most active station for the previous year </a><br/>"
+        f"<i>Usage: Append /api/v1.0/tobs to the URL </i></li><br/>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/2012-02-28'>Minimum, average and maximum temperatures for a given start date</a><br/>"
+        f"<i>Usage: Append a start date to URL such as 2015-01-01 </i></li><br/>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/2012-02-28/2012-03-05'>Minimum, average and maximum temperatures for a given date range</a></li>"
+        f"<i>Usage: Append start and end dates to URL such as 2015-01-01/2015-01-10 </i></li><br/>"
+        f"</ul>"
     )
 
 
@@ -162,9 +170,9 @@ def temp_date(start):
     temp_stats = []
     for temp in temps:
         temps_dict = {}
-        temps_dict["Min.Temp"] = temps[0][0]
-        temps_dict["Avg.Temp"] = temps[0][1]
-        temps_dict["Max.Temp"] = temps[0][2]
+        temps_dict["Min.Temp"] = round(temps[0][0],2)
+        temps_dict["Avg.Temp"] = round(temps[0][1],2)
+        temps_dict["Max.Temp"] = round(temps[0][2],2)
         temp_stats.append(temps_dict)
 
     return jsonify(temps_dict)
@@ -200,9 +208,9 @@ def temp_date_range(start,end):
     temp_stats = []
     for temp in temps:
         temps_dict = {}
-        temps_dict["Min.Temp"] = temps[0][0]
-        temps_dict["Avg.Temp"] = temps[0][1]
-        temps_dict["Max.Temp"] = temps[0][2]
+        temps_dict["Min.Temp"] = round(temps[0][0],2)
+        temps_dict["Avg.Temp"] = round(temps[0][1],2)
+        temps_dict["Max.Temp"] = round(temps[0][2],2)
         temp_stats.append(temps_dict)
 
     return jsonify(temps_dict)
