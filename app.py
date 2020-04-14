@@ -43,19 +43,20 @@ def welcome():
         f"<img src='https://thebigphotos.com/wp-content/uploads/2018/07/wailea-hawaii.jpg'" 
         f"<br/><br/><h3>Available Routes:</h3>"
         f"<ul>"
-        f"<li><a href='http://127.0.0.1:5000/api/v1.0/precipitation'>Precipitation data</a></br>"
-        f"<i>Usage: Append /api/v1.0/precipitation to the URL </i></li><br/>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/precipitation'>Precipitation data</a><br/>"
+        f"<i>Usage: Append /api/v1.0/precipitation to the URL </i></li><br/>"       
         f"<li><a href='http://127.0.0.1:5000/api/v1.0/stations'>Stations in the dataset</a><br/>"
         f"<i>Usage: Append /api/v1.0/stations to the URL </i></li><br/>"
         f"<li><a href='http://127.0.0.1:5000/api/v1.0/tobs'>Temperature observations of the most active station for the previous year </a><br/>"
         f"<i>Usage: Append /api/v1.0/tobs to the URL </i></li><br/>"
-        f"<li><a href='http://127.0.0.1:5000/api/v1.0/2012-02-28'>Minimum, average and maximum temperatures for a given start date</a><br/>"
-        f"<i>Usage: Append a start date to URL such as 2015-01-01 </i></li><br/>"
-        f"<li><a href='http://127.0.0.1:5000/api/v1.0/2012-02-28/2012-03-05'>Minimum, average and maximum temperatures for a given date range</a></li>"
-        f"<i>Usage: Append start and end dates to URL such as 2015-01-01/2015-01-10 </i></li><br/>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/2015-01-01'>Minimum, average and maximum temperatures for a given start date, as 2015-01-01</a><br/>"
+        f"<i>Usage: Append a start date to URL such as /api/v1.0/startdate<br/>"
+        f"Enter dates only between 2010-01-01 and 2017-08-23 </i></li><br/>"
+        f"<li><a href='http://127.0.0.1:5000/api/v1.0/2015-01-01/2015-01-10'>Minimum, average and maximum temperatures for a given date range, as 2015-01-01/2015-01-10</a><br/>"
+        f"<i>Usage: Append start and end dates to URL such as /api/v1.0/startdate/enddate<br/>"
+        f"Enter dates only between 2010-01-01 and 2017-08-23</i></li><br/>"
         f"</ul>"
     )
-
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
@@ -152,37 +153,44 @@ def temp_date(start):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of the minimum temperature, the average temperature, and the max temperature for a given start date"""
+    """Return a list of the minimum temperature, the average temperature, and the max temperature for all dates greater than and equal to the start date"""
     # Query most active station
 
     start_dt = datetime.strptime(start, "%Y-%m-%d")
+    start_dt = datetime.date(start_dt)
+    first_dt = datetime.strptime('2010-01-01', "%Y-%m-%d")
+    first_dt = datetime.date(first_dt)
+    last_dt = datetime.strptime('2017-08-23', "%Y-%m-%d")
+    last_dt = datetime.date(last_dt)
     print("Start Date: ", start_dt)
-
+    if ((start_dt > last_dt) | (start_dt < first_dt)): 
+        return "Date not found in dataset"
+    else:
     # Query minimum,average and maximum temperature for a given start date
-    temps = (session.query(func.min(Measurement.tobs),func.avg(Measurement.tobs),func.max(Measurement.tobs))
-                           .filter(Measurement.date >= start_dt)).all()
+        temps = (session.query(func.min(Measurement.tobs),func.avg(Measurement.tobs),func.max(Measurement.tobs))
+                               .filter(Measurement.date >= start_dt)).all()
 
-    print(temps)
+        print(temps)
  
-    session.close()
+        session.close()
 
     # Create a dictionary from the row data and append to a list 
-    temp_stats = []
-    for temp in temps:
-        temps_dict = {}
-        temps_dict["Min.Temp"] = round(temps[0][0],2)
-        temps_dict["Avg.Temp"] = round(temps[0][1],2)
-        temps_dict["Max.Temp"] = round(temps[0][2],2)
-        temp_stats.append(temps_dict)
+        temp_stats = []
+        for temp in temps:
+            temps_dict = {}
+            temps_dict["Min.Temp"] = round(temps[0][0],2)
+            temps_dict["Avg.Temp"] = round(temps[0][1],2)
+            temps_dict["Max.Temp"] = round(temps[0][2],2)
+            temp_stats.append(temps_dict)
 
-    return jsonify(temps_dict)
-
+        return jsonify(temps_dict)
+    
 @app.route("/api/v1.0/<start>/<end>")
 def temp_date_range(start,end):
     # Create our session (link) from Python to the DB
     session = Session(engine)
 
-    """Return a list of the minimum temperature, the average temperature, and the max temperature for a given start date"""
+    """Return a list of the minimum temperature, the average temperature, and the max temperature for a given date range"""
     # Query most active station
 
     start_dt = datetime.strptime(start, "%Y-%m-%d")
@@ -191,32 +199,39 @@ def temp_date_range(start,end):
     end_dt = datetime.date(end_dt)
     print("Start Date: ", start_dt)
     print("End Date: ", end_dt)
+    last_dt = datetime.strptime('2017-08-23', "%Y-%m-%d")
+    last_dt = datetime.date(last_dt)
+    first_dt = datetime.strptime('2010-01-01', "%Y-%m-%d")
+    first_dt = datetime.date(first_dt)
+    print("Start Date: ", start_dt)
+    if ((start_dt > last_dt) | (start_dt < first_dt)): 
+        return "Date not found in dataset"
+    if ((end_dt > last_dt) | (end_dt < first_dt)): 
+        return "Date not found in dataset"
+    else:
+    # Query minimum,average and maximum temperature for a given date range
+        temps = (session.query(func.min(Measurement.tobs),func.avg(Measurement.tobs),func.max(Measurement.tobs))
+                               .filter(Measurement.date >= start_dt)
+                               .filter(Measurement.date <= end_dt)).all()
 
-    # Query minimum,average and maximum temperature for a given start date
-    temps = (session.query(func.min(Measurement.tobs),func.avg(Measurement.tobs),func.max(Measurement.tobs))
-                           .filter(Measurement.date >= start_dt)
-                           .filter(Measurement.date <= end_dt)).all()
-
-    print(temps)
+        print(temps)
  
-    session.close()
+        session.close()
 
     #Convert list of tuples into normal list
-    #temp_stats = list(np.ravel(temps))
+        #temp_stats = list(np.ravel(temps))
 
     # Create a dictionary from the row data and append to a list 
-    temp_stats = []
-    for temp in temps:
-        temps_dict = {}
-        temps_dict["Min.Temp"] = round(temps[0][0],2)
-        temps_dict["Avg.Temp"] = round(temps[0][1],2)
-        temps_dict["Max.Temp"] = round(temps[0][2],2)
-        temp_stats.append(temps_dict)
+        temp_stats = []
+        for temp in temps:
+            temps_dict = {}
+            temps_dict["Min.Temp"] = round(temps[0][0],2)
+            temps_dict["Avg.Temp"] = round(temps[0][1],2)
+            temps_dict["Max.Temp"] = round(temps[0][2],2)
+            temp_stats.append(temps_dict)
 
-    return jsonify(temps_dict)
-
-    #return jsonify(temp_stats)
-    
-
+        return jsonify(temps_dict)
+        #return jsonify(temp_stats)
+   
 if __name__ == '__main__':
     app.run(debug=True)
