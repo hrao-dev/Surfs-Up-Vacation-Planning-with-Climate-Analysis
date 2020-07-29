@@ -1,8 +1,6 @@
 #  Surfs Up!
 
-An application to assist in vacation trip planning in Hawaii with climate analysis using Python (Pandas, Matplotlib), SQLAlchemy (ORM Queries) and Flask.
-
-It looks at specific trip dates to model the climate temperature normals and precipitation based on historical weather data in  Hawaii from 08-23-2017 to 08-23-2017
+An application to assist in vacation trip planning in Hawaii with climate analysis using Python (Pandas, Matplotlib), SQLAlchemy (ORM Queries) and Flask. It looks at specific trip dates to model the climate temperature normals and precipitation based on historical weather data in Hawaii from 08-23-2017 to 08-23-2017
 
 <img src="https://github.com/the-Coding-Boot-Camp-at-UT/UT-MCC-DATA-PT-01-2020-U-C/blob/master/homework-instructions/10-Advanced-Data-Storage-and-Retrieval/Instructions/Images/surfs-up.png" alt="Surfs up">
 
